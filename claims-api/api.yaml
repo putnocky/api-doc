@@ -1,0 +1,92 @@
+---
+# This is a sample Swagger spec, describing a simple API as a starting point.
+swagger: "2.0"
+info:
+  description: Claim Service, trigger claims, retrieve benefits
+  version: '1.0.0'
+  title: Claims
+basePath: /api
+schemes:
+- http
+- https
+consumes:
+  - application/json
+paths:
+  /claims:
+    # Operations are identified by an HTTP method.
+    get:
+      description: Retrieves all claims from the system
+      operationId: findClaims
+      produces:
+        - application/vnd.claim.v1+json
+        - application/vnd.claim.v2+json
+      parameters:
+      - name: limit
+        in: query
+        description: maximum number of results to return
+        required: false
+        type: integer
+        format: int32
+      responses:
+        200:
+          description: Successful get claims response
+          schema:
+             type: array
+             items:
+              $ref: "#/definitions/claim"
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/errorModel'
+  /claims/{id}:
+    get:
+      description: Retrieves one specific claim from the system by id
+      operationId: findClaim
+      parameters:
+        - in: path
+          name: id
+          type: integer
+          required: true
+          description: Numeric ID of the claim
+        - in: header
+          name: Accept
+          type: string
+          required: false
+          description: For parsing out the requested service version in spring.
+      produces:
+        - application/vnd.claim.v1+json
+        - application/vnd.claim.v2+json
+      responses:
+        200:
+          description: OK - Successful get claims response
+          schema:
+              $ref: "#/definitions/claim"
+        default:
+          description: unexpected error
+          schema:
+            $ref: '#/definitions/errorModel'
+
+definitions:
+  claim:
+    type: object
+    description: A claim record
+    properties:
+      claimId:
+        type: string
+      claimName:
+        type: string
+      claimDescription:
+        type: string
+      customerId: 
+        type: string
+  errorModel:
+    type: object
+    required:
+      - code
+      - message
+    properties:
+      code:
+        type: integer
+        format: int32
+      message:
+        type: string
